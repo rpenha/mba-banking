@@ -1,11 +1,9 @@
 using Banking.Application.EntityFramework;
-using Banking.Core.Customers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using Riok.Mapperly.Abstractions;
 
-namespace Banking.Application.Features.GetCustomer;
+namespace Banking.Application.Features.Customers;
 
 public class GetCustomerHandler : IRequestHandler<GetCustomerQuery, GetCustomerResult>
 {
@@ -53,11 +51,4 @@ public static class ReadModels
         public required DateTimeOffset CreatedAt { get; init; }
         public required DateTimeOffset UpdatedAt { get; set; }
     }
-}
-
-[Mapper]
-public static partial class ReadModelsMapper
-{
-    [MapperIgnoreSource(nameof(Customer.Name))]
-    public static partial ReadModels.Customer ToReadModel(this Customer customer);
 }

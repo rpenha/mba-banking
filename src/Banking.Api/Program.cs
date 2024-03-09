@@ -1,6 +1,7 @@
 using Banking.Api;
 using Banking.Application.EntityFramework;
-using Banking.Application.Features.CreateCustomer;
+using Banking.Application.Features;
+using Banking.Application.Features.Customers;
 using Banking.Core.Customers;
 using Microsoft.EntityFrameworkCore;
 
