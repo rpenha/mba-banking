@@ -42,10 +42,6 @@ public sealed record TaxId
 
     public override string ToString() => ToString("N");
 
-    public static implicit operator string(TaxId value) => value.ToString();
-
-    public static implicit operator TaxId(string value) => new(value);
-
     private static bool IsValid(string value)
     {
         value = Normalize(value);
@@ -82,16 +78,7 @@ public sealed record TaxId
 
     private static string Normalize(string numero) => Regex.Replace(numero, @"[^\d]", string.Empty);
 
-    // private sealed class JsonConverter : JsonConverter<TaxId>
-    // {
-    //     public override TaxId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    //     {
-    //         return From(reader.GetString() ?? throw new InvalidOperationException());
-    //     }
-    //
-    //     public override void Write(Utf8JsonWriter writer, TaxId value, JsonSerializerOptions options)
-    //     {
-    //         writer.WriteStringValue(value.ToString());
-    //     }
-    // }
+    public static implicit operator string(TaxId value) => value.ToString();
+
+    public static implicit operator TaxId(string value) => From(value);
 }
