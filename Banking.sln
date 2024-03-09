@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Core", "src\Banking.Core\Banking.Core.csproj", "{7247A863-258C-45B5-ACAA-04E9C196534F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Api", "src\Banking.Api\Banking.Api.csproj", "{AC3C11B0-A39D-422C-90E6-5F6B4328ADAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Application", "src\Banking.Application\Banking.Application.csproj", "{E80877B2-1539-4772-A8BA-3115273DE7A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7247A863-258C-45B5-ACAA-04E9C196534F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7247A863-258C-45B5-ACAA-04E9C196534F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7247A863-258C-45B5-ACAA-04E9C196534F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7247A863-258C-45B5-ACAA-04E9C196534F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC3C11B0-A39D-422C-90E6-5F6B4328ADAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC3C11B0-A39D-422C-90E6-5F6B4328ADAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC3C11B0-A39D-422C-90E6-5F6B4328ADAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC3C11B0-A39D-422C-90E6-5F6B4328ADAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E80877B2-1539-4772-A8BA-3115273DE7A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E80877B2-1539-4772-A8BA-3115273DE7A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E80877B2-1539-4772-A8BA-3115273DE7A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E80877B2-1539-4772-A8BA-3115273DE7A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
