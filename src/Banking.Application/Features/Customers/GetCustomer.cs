@@ -13,11 +13,11 @@ public class GetCustomerHandler : IRequestHandler<GetCustomerQuery, GetCustomerR
     {
         _dbContext = dbContext;
     }
-    
+
     public async Task<GetCustomerResult> Handle(GetCustomerQuery request, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Customers
-                                     .Where(x => x.Id == request.CustomerId)
+                                     .Where(x => (Guid)x.Id == request.CustomerId)
                                      .Select(x => x.ToReadModel())
                                      .FirstOrDefaultAsync(cancellationToken);
 
@@ -37,7 +37,6 @@ public partial class GetCustomerResult : OneOfBase<CustomerFound, CustomerNotFou
 public readonly record struct CustomerFound(ReadModels.Customer Customer);
 
 public readonly record struct CustomerNotFound(GetCustomerQuery Request);
-
 
 public static class ReadModels
 {

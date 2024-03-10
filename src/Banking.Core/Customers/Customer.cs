@@ -1,12 +1,12 @@
 namespace Banking.Core.Customers;
 
-public class Customer : AggregateRoot<Guid>
+public class Customer : AggregateRoot<CustomerId>
 {
     private Customer()
     {
     }
 
-    public Customer(Guid id, TaxId taxId, PersonName name, DateOfBirth dateOfBirth)
+    public Customer(CustomerId id, TaxId taxId, PersonName name, DateOfBirth dateOfBirth)
         : base(id)
     {
         TaxId = taxId;

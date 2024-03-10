@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="LanguageExt.Core" Version="5.0.0-alpha.1" />
+      <PackageReference Include="NodaMoney" Version="1.0.5" />
     </ItemGroup>
 
 </Project>

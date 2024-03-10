@@ -20,6 +20,7 @@ namespace Banking.Application.Migrations
                     date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
                     name_first_name = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     name_last_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },

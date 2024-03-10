@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Banking.Core;
-using Banking.Core.Customers;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +15,11 @@ public abstract class EntityFrameworkRespository<TId, TAggregateRoot, TDbContext
     private readonly ActivitySource _activitySource;
     private readonly EntityFrameworkUnitOfWork _uow;
 
-    protected EntityFrameworkRespository(TDbContext dbContext, ActivitySource activitySource)
+    protected EntityFrameworkRespository(TDbContext dbContext)
     {
         _dbContext = dbContext;
-        _activitySource = activitySource;
-        _uow = new EntityFrameworkUnitOfWork(dbContext, activitySource);
+        _activitySource = Activity.Current?.Source ?? new ActivitySource(nameof(EntityFrameworkRespository<TId, TAggregateRoot, TDbContext>));;
+        _uow = new EntityFrameworkUnitOfWork(dbContext);
     }
 
     private DbSet<TAggregateRoot> Collection => _dbContext.Set<TAggregateRoot>();
@@ -49,11 +48,4 @@ public abstract class EntityFrameworkRespository<TId, TAggregateRoot, TDbContext
     public IUnitOfWork GetUnitOfWork() => _uow;
 
     public async ValueTask DisposeAsync() => await _uow.DisposeAsync();
-}
-
-public class CustomerRepository : EntityFrameworkRespository<Guid, Customer, BankingDbContext>, ICustomerRepository
-{
-    public CustomerRepository(BankingDbContext dbContext, ActivitySource activitySource) : base(dbContext, activitySource)
-    {
-    }
 }

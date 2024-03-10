@@ -1,10 +1,9 @@
-using Banking.Application.Features;
 using Banking.Application.Features.Customers;
 using MediatR;
 
-namespace Banking.Api;
+namespace Banking.Api.Endpoints;
 
-public static class CustomerEndpoints
+public static class CustomersEndpoints
 {
     public static RouteGroupBuilder MapCustomerApi(this RouteGroupBuilder group)
     {
@@ -17,6 +16,8 @@ public static class CustomerEndpoints
              .Produces<ReadModels.Customer>()
              .Produces(StatusCodes.Status404NotFound)
              .Produces(StatusCodes.Status500InternalServerError);
+        
+        group.WithTags("Customers");
         
         return group;
     }

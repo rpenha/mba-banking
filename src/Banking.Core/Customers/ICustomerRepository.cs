@@ -1,3 +1,3 @@
 namespace Banking.Core.Customers;
 
-public interface ICustomerRepository : IRepository<Guid, Customer>;
+public interface ICustomerRepository : IRepository<CustomerId, Customer>;

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Banking.Core.Customers;
+namespace Banking.Core;
 
 public sealed record TaxId
 {

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Banking.Application.Migrations
 {
     [DbContext(typeof(BankingDbContext))]
-    [Migration("20240309135032_Initial")]
+    [Migration("20240309211308_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,7 +29,6 @@ namespace Banking.Application.Migrations
             modelBuilder.Entity("Banking.Core.Customers.Customer", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
@@ -50,6 +49,12 @@ namespace Banking.Application.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.ComplexProperty<Dictionary<string, object>>("Name", "Banking.Core.Customers.Customer.Name#PersonName", b1 =>
                         {

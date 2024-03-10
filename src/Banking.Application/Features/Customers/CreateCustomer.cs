@@ -37,7 +37,12 @@ public sealed class CreateCustomerHandler : IRequestHandler<CreateCustomerComman
     }
 }
 
-public sealed record CreateCustomerCommand(Guid CustomerId, string TaxId, string FirstName, string LastName, DateTimeOffset DateOfBirth)
+public sealed record CreateCustomerCommand(
+    Guid CustomerId,
+    string TaxId,
+    string FirstName,
+    string LastName,
+    DateTimeOffset DateOfBirth)
     : IRequest<CreateCustomerResult>
 {
     public void Deconstruct(out Guid customerId, out string taxId, out string firstName, out string lastName, out DateTimeOffset dateOfBirth)

@@ -1,7 +1,8 @@
-using Banking.Api;
+using Banking.Api.Endpoints;
 using Banking.Application.EntityFramework;
-using Banking.Application.Features;
+using Banking.Application.EntityFramework.Repositories;
 using Banking.Application.Features.Customers;
+using Banking.Core.Accounts;
 using Banking.Core.Customers;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,7 @@ builder.Services.AddDbContext<BankingDbContext>(options =>
 });
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -41,7 +43,7 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 
-app.MapGroup("/v1/customers")
-   .MapCustomerApi();
+app.MapGroup("/v1/customers").MapCustomerApi();
+app.MapGroup("/v1/checking-accounts").MapChekingAccountApi();
 
 app.Run();

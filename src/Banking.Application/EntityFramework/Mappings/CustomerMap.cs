@@ -3,12 +3,17 @@ using Banking.Core.Customers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Banking.Application.EntityFramework;
+namespace Banking.Application.EntityFramework.Mappings;
 
 public sealed class CustomerMap : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
+        builder.Property(x => x.Id);
+
+        builder.Property(x => x.Version)
+               .IsRowVersion();
+        
         builder.HasIndex(c => c.TaxId)
                .IsUnique();
 

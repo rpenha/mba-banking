@@ -9,10 +9,10 @@ public sealed class EntityFrameworkUnitOfWork : IUnitOfWork
     private readonly DbContext _dbContext;
     private readonly ActivitySource _activitySource;
 
-    public EntityFrameworkUnitOfWork(DbContext dbContext, ActivitySource activitySource)
+    public EntityFrameworkUnitOfWork(DbContext dbContext)
     {
         _dbContext = dbContext;
-        _activitySource = activitySource;
+        _activitySource = Activity.Current?.Source ?? new ActivitySource(nameof(EntityFrameworkUnitOfWork));
     }
 
     public ValueTask DisposeAsync()
