@@ -21,13 +21,14 @@ public sealed class CreateCustomerHandler : IRequestHandler<CreateCustomerComman
         try
         {
             // TODO: Check if a customer with this taxId already exists
-            var (customerId, taxId, firstName, lastName, dateOfBirth) = request;
+            var (taxId, firstName, lastName, dateOfBirth) = request;
             await using var uow = _repository.GetUnitOfWork();
             var name = PersonName.From(firstName, lastName);
+            var customerId = CustomerId.NewId();
             var customer = new Customer(customerId, taxId, name, dateOfBirth);
             await _repository.SaveAsync(customer, cancellationToken);
             await uow.CommitAsync(cancellationToken);
-            return new CreateCustomerSuccess();
+            return new CreateCustomerSuccess(customerId);
         }
         catch (Exception ex)
         {
@@ -38,16 +39,14 @@ public sealed class CreateCustomerHandler : IRequestHandler<CreateCustomerComman
 }
 
 public sealed record CreateCustomerCommand(
-    Guid CustomerId,
     string TaxId,
     string FirstName,
     string LastName,
     DateTimeOffset DateOfBirth)
     : IRequest<CreateCustomerResult>
 {
-    public void Deconstruct(out Guid customerId, out string taxId, out string firstName, out string lastName, out DateTimeOffset dateOfBirth)
+    public void Deconstruct(out string taxId, out string firstName, out string lastName, out DateTimeOffset dateOfBirth)
     {
-        customerId = CustomerId;
         taxId = TaxId;
         firstName = FirstName;
         lastName = LastName;
@@ -58,6 +57,6 @@ public sealed record CreateCustomerCommand(
 [GenerateOneOf]
 public partial class CreateCustomerResult : OneOfBase<CreateCustomerSuccess, CreateCustomerFailure>;
 
-public readonly record struct CreateCustomerFailure(string Description);
+public readonly record struct CreateCustomerSuccess(Guid CustomerId);
 
-public readonly record struct CreateCustomerSuccess;
+public readonly record struct CreateCustomerFailure(string Description);

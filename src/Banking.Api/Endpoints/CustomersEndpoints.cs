@@ -32,7 +32,7 @@ public static class CustomersEndpoints
         var requestPath = context.Request.Path;
 
         return result.Match<IResult>(
-            _ => TypedResults.Created($"{requestPath}/{command.CustomerId}"),
+            success => TypedResults.Created($"{requestPath}/{success.CustomerId}"),
             failure => TypedResults.Problem(title: failure.Description)
         );
     }
