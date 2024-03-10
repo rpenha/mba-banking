@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using NodaMoney;
 using OneOf;
 
-namespace Banking.Application.Features.Customers;
+namespace Banking.Application.Features.CheckingAccounts;
 
 public sealed class CreateCheckingAccountHandler : IRequestHandler<CreateCheckingAccountCommand, CreateCheckingAccountResult>
 {

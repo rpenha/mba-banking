@@ -1,3 +1,4 @@
+using Banking.Application.Features.CheckingAccounts;
 using Banking.Application.Features.Customers;
 using MediatR;
 
