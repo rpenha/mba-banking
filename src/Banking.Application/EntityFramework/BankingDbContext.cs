@@ -2,6 +2,7 @@ using Banking.Application.EntityFramework.Converters;
 using Banking.Application.EntityFramework.Mappings;
 using Banking.Core.Accounts;
 using Banking.Core.Customers;
+using Banking.Core.Transactions;
 using Microsoft.EntityFrameworkCore;
 using NodaMoney;
 
@@ -14,12 +15,16 @@ public class BankingDbContext : DbContext
     }
 
     public DbSet<Customer> Customers { get; init; }
+    public DbSet<Account> Accounts { get; init; }
+    public DbSet<Transaction> Transactions { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new CustomerMap());
-        modelBuilder.ApplyConfiguration(new BankAccountMap());
+        modelBuilder.ApplyConfiguration(new AccountMap());
+        modelBuilder.ApplyConfiguration(new TransactionMap());
+        //modelBuilder.ApplyConfiguration(new CheckingAccountMap());
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -33,7 +38,17 @@ public class BankingDbContext : DbContext
                             .HaveConversion<CurrencyConverter>()
                             .HaveMaxLength(8);
         
-        configurationBuilder.Properties<CustomerId>().HaveConversion<CustomerIdConverter>();
-        configurationBuilder.Properties<BankAccountId>().HaveConversion<BankAccountIdConverter>();
+        configurationBuilder.Properties<CustomerId>()
+                            .HaveConversion<CustomerIdConverter>();
+        
+        configurationBuilder.Properties<AccountId>()
+                            .HaveConversion<AccountIdConverter>();
+        
+        configurationBuilder.Properties<TransactionId>()
+                            .HaveConversion<TransactionIdConverter>();
+        
+        configurationBuilder.Properties<Enum>()
+                            .HaveConversion<string>()
+                            .HaveMaxLength(32);
     }
 }

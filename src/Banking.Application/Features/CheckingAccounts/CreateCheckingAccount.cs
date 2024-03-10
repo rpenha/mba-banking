@@ -8,10 +8,10 @@ namespace Banking.Application.Features.CheckingAccounts;
 
 public sealed class CreateCheckingAccountHandler : IRequestHandler<CreateCheckingAccountCommand, CreateCheckingAccountResult>
 {
-    private readonly IBankAccountRepository _repository;
+    private readonly IAccountRepository _repository;
     private readonly ILogger<CreateCheckingAccountHandler> _logger;
 
-    public CreateCheckingAccountHandler(IBankAccountRepository repository, ILogger<CreateCheckingAccountHandler> logger)
+    public CreateCheckingAccountHandler(IAccountRepository repository, ILogger<CreateCheckingAccountHandler> logger)
     {
         _repository = repository;
         _logger = logger;

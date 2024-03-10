@@ -1,9 +1,11 @@
+using System.Text.Json.Serialization;
 using Banking.Api.Endpoints;
 using Banking.Application.EntityFramework;
 using Banking.Application.EntityFramework.Repositories;
 using Banking.Application.Features.Customers;
 using Banking.Core.Accounts;
 using Banking.Core.Customers;
+using Banking.Core.Transactions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,8 +25,16 @@ builder.Services.AddDbContext<BankingDbContext>(options =>
            .UseSnakeCaseNamingConvention();
 });
 
+#region Repositories
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+#endregion
+
+
+#region Swagger
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -32,18 +42,34 @@ builder.Services.AddSwaggerGen();
 
 #endregion
 
+#endregion
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+
 var app = builder.Build();
+
+#region Swagger
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     options.RoutePrefix = string.Empty;
 });
 
-app.MapGroup("/v1/customers").MapCustomerApi();
-app.MapGroup("/v1/checking-accounts").MapChekingAccountApi();
+#endregion
+
+app.MapGroup("/v1/customers").MapCustomersApi();
+app.MapGroup("/v1/accounts").MapAccountsApi();
 
 app.Run();

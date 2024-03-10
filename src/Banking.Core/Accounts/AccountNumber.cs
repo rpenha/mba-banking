@@ -1,13 +1,13 @@
 namespace Banking.Core.Accounts;
 
-public readonly record struct BankAccountNumber
+public readonly record struct AccountNumber
 {
     private readonly string _value;
     private const int NUMBER_LENGTH = 6;
     private const int TOTAL_LENGTH = 7;
-    private static readonly BankAccountNumber Empty = new(new string('0', TOTAL_LENGTH + 1));
+    private static readonly AccountNumber Empty = new(new string('0', TOTAL_LENGTH + 1));
 
-    private BankAccountNumber(string value)
+    private AccountNumber(string value)
     {
         _value = value;
     }
@@ -16,20 +16,20 @@ public readonly record struct BankAccountNumber
     //
     // public char VerificationDigit => _value.Last();
 
-    public static BankAccountNumber From(string input)
+    public static AccountNumber From(string input)
     {
         if (!IsValidAccountNumber(input))
             throw new ArgumentException($"Invalid bank account number: {input}", nameof(input));
 
-        return new BankAccountNumber(input);
+        return new AccountNumber(input);
     }
 
-    public static BankAccountNumber NewBankAccountNumber()
+    public static AccountNumber NewAccountNumber()
     {
         // Generate random account number string with desired length
         var number = string.Join("", Enumerable.Repeat("0123456789", NUMBER_LENGTH).Select(s => s[new Random().Next(s.Length)]));
         var digit = ComputeVerificationDigit(number);
-        return new BankAccountNumber($"{number}{digit}");
+        return new AccountNumber($"{number}{digit}");
     }
 
     private static bool IsValidAccountNumber(string input)
@@ -37,7 +37,7 @@ public readonly record struct BankAccountNumber
         if (input.Length != TOTAL_LENGTH) return false;
         var number = input[..NUMBER_LENGTH];
         var dac = input.Last();
-        return dac != ComputeVerificationDigit(number);
+        return dac == ComputeVerificationDigit(number);
     }
 
     private static char ComputeVerificationDigit(string accountNumber)
@@ -50,12 +50,12 @@ public readonly record struct BankAccountNumber
         return (char)(remainder + 48); // Convert remainder to numerical digit character
     }
 
-    public static bool TryParse(string input, out BankAccountNumber parsedAccountNumber)
+    public static bool TryParse(string input, out AccountNumber parsedAccountNumber)
     {
         try
         {
             // Attempt to create a BankAccountNumber instance
-            BankAccountNumber accountNumber = input;
+            AccountNumber accountNumber = input;
             parsedAccountNumber = accountNumber;
             return true;
         }
@@ -68,7 +68,7 @@ public readonly record struct BankAccountNumber
 
     public override string ToString() => _value;
 
-    public static implicit operator BankAccountNumber(string accountNumber) => From(accountNumber);
+    public static implicit operator AccountNumber(string accountNumber) => From(accountNumber);
 
-    public static implicit operator string(BankAccountNumber accountNumber) => accountNumber.ToString();
+    public static implicit operator string(AccountNumber accountNumber) => accountNumber.ToString();
 }

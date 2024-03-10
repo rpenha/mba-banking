@@ -3,16 +3,16 @@ using NodaMoney;
 
 namespace Banking.Core.Accounts;
 
-public class CheckingAccount : BankAccount
+public class CheckingAccount : Account
 {
     protected CheckingAccount()
     {
     }
 
-    private CheckingAccount(BankAccountId id,
+    private CheckingAccount(AccountId id,
                             CustomerId customerId,
                             BankBranch bankBranch,
-                            BankAccountNumber accountNumber,
+                            AccountNumber accountNumber,
                             Money totalLimit) : base(id, bankBranch, accountNumber, totalLimit.Currency)
     {
         CustomerId = customerId;
@@ -21,13 +21,33 @@ public class CheckingAccount : BankAccount
     }
 
     public CustomerId CustomerId { get; private init; }
-    public Money CurrentLimit { get; private set; }
+
     public Money TotalLimit { get; private set; }
+
+    public Money CurrentLimit { get; private set; }
+
+    public bool IsUsingLimit
+    {
+        get => CurrentLimit < TotalLimit;
+        
+        // Write-only property
+        // ReSharper disable once ValueParameterNotUsed
+        init { }
+    }
+
+    public Money UsedLimit
+    {
+        get { return TotalLimit - CurrentLimit; }
+        
+        // Write-only property
+        // ReSharper disable once ValueParameterNotUsed
+        init { }
+    }
 
     public static CheckingAccount NewCheckingAccount(CustomerId customerId, BankBranch bankBranch, Money totalLimit)
     {
-        var id = BankAccountId.NewId();
-        var accountNumber = BankAccountNumber.NewBankAccountNumber();
+        var id = AccountId.NewId();
+        var accountNumber = AccountNumber.NewAccountNumber();
         return new CheckingAccount(id,
                                    customerId,
                                    bankBranch,
@@ -35,14 +55,39 @@ public class CheckingAccount : BankAccount
                                    totalLimit);
     }
 
-    // public void SetTotalLimit(Money totalLimit)
-    // {
-    //     if (totalLimit < 0)
-    //         throw new ArgumentException($"Invalid total limit value for account: {totalLimit}", nameof(totalLimit));
-    //     if (totalLimit.Currency != Currency)
-    //         throw new ArgumentException($"Invalid currency: {totalLimit.Currency}", nameof(totalLimit));
-    //
-    //     TotalLimit = totalLimit;
-    //     UpdatedAt = DateTimeProvider.Now;
-    // }
+    public override void Deposit(Money value)
+    {
+        CheckValidTransactionValue(value);
+
+        var isUsingLimit = IsUsingLimit;
+        var depositExceedsUsedLimit = value > UsedLimit;
+        var constraints = (isUsingLimit, depositExceedsUsedLimit);
+
+        switch (constraints)
+        {
+            case (false, _):
+                base.Deposit(value);
+                break;
+            case (true, false):
+                CurrentLimit += value;
+                break;
+            case (true, true):
+                value -= UsedLimit;
+                CurrentLimit = TotalLimit;
+                base.Deposit(value);
+                break;
+        }
+    }
+
+    public override bool Withdraw(Money value)
+    {
+        if (value > Balance + CurrentLimit)
+            return false;
+
+        if (value <= Balance)
+            return base.Withdraw(value);
+
+        CurrentLimit -= value - Balance;
+        return base.Withdraw(Balance);
+    }
 }

@@ -1,6 +1,6 @@
 namespace Banking.Core.Transactions;
 
-public enum TransactionType
+public enum TransactionDirection
 {
     CashIn,
     CashOut
