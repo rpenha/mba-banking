@@ -1,3 +1,4 @@
+using Banking.Application.Features;
 using Banking.Application.Features.CheckingAccounts;
 using Banking.Application.Features.Customers;
 using MediatR;
@@ -22,7 +23,8 @@ public static class CustomersEndpoints
         group.MapPost("/{customerId:guid}/checking-accounts", CreateCheckingAccount)
              .Produces(StatusCodes.Status201Created)
              .Produces(StatusCodes.Status400BadRequest)
-             .Produces(StatusCodes.Status500InternalServerError);
+             .Produces(StatusCodes.Status500InternalServerError)
+             .WithTags("Accounts");
         
         group.WithTags("Customers");
         

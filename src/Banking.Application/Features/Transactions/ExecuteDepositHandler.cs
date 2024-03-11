@@ -1,3 +1,4 @@
+using Banking.Application.Features.CheckingAccounts;
 using Banking.Core.Accounts;
 using Banking.Core.Transactions;
 using MediatR;
@@ -5,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using NodaMoney;
 using OneOf;
 
-namespace Banking.Application.Features.CheckingAccounts;
+namespace Banking.Application.Features.Transactions;
 
 public sealed class ExecuteDepositHandler : IRequestHandler<ExecuteDepositCommand, ExecuteDepositResult>
 {
@@ -30,7 +31,7 @@ public sealed class ExecuteDepositHandler : IRequestHandler<ExecuteDepositComman
 
         ExecuteDepositResult result = null!;
 
-        await accountLoad.Match(
+        await accountLoad.Match<Task>(
             async account =>
             {
                 var value = new Money(amount, account.Currency);

@@ -1,4 +1,8 @@
+using System.Web;
+using Banking.Application.Features;
 using Banking.Application.Features.CheckingAccounts;
+using Banking.Application.Features.Transactions;
+using Banking.Core.Accounts;
 using Banking.Core.Transactions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -7,46 +11,30 @@ namespace Banking.Api.Endpoints;
 
 public static class AccountsEndpoints
 {
-    public static RouteGroupBuilder MapAccountsApi(this RouteGroupBuilder group)
+    public static RouteGroupBuilder MapTransactionsApi(this RouteGroupBuilder group)
     {
-        // group.MapPost("/", CreateCheckingAccount)
-        //      .Produces(StatusCodes.Status201Created)
-        //      .Produces(StatusCodes.Status400BadRequest)
-        //      .Produces(StatusCodes.Status500InternalServerError);
-
         group.MapPost("/{accountId:guid}/deposits", ExecuteDeposit)
              .Produces(StatusCodes.Status204NoContent)
              .Produces(StatusCodes.Status400BadRequest)
              .Produces(StatusCodes.Status422UnprocessableEntity)
-             .Produces(StatusCodes.Status500InternalServerError)
-             .WithTags("Transactions");
+             .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapPost("/{accountId:guid}/withdrawals", ExecuteWithdraw)
              .Produces(StatusCodes.Status204NoContent)
              .Produces(StatusCodes.Status400BadRequest)
              .Produces(StatusCodes.Status422UnprocessableEntity)
-             .Produces(StatusCodes.Status500InternalServerError)
-             .WithTags("Transactions");
+             .Produces(StatusCodes.Status500InternalServerError);
 
-        group.WithTags("Checking Accounts");
+        group.MapGet("/{accountId:guid}/transactions", SearchAccountTransactions)
+             .Produces<SearchAccountTransactionsResponse>()
+             .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces(StatusCodes.Status500InternalServerError);
+
+        group.WithTags("Transactions");
 
         return group;
     }
-
-    // private static async Task<IResult> CreateCheckingAccount(CreateCheckingAccountCommand command,
-    //                                                          IMediator mediator,
-    //                                                          HttpContext context,
-    //                                                          CancellationToken cancellationToken = default)
-    // {
-    //     var result = await mediator.Send(command, cancellationToken);
-    //
-    //     var requestPath = context.Request.Path;
-    //
-    //     return result.Match<IResult>(
-    //         success => TypedResults.Created($"{requestPath}/{success.AccountId}"),
-    //         failure => TypedResults.Problem(title: failure.Description)
-    //     );
-    // }
 
     private static async Task<IResult> ExecuteDeposit([FromRoute] Guid accountId,
                                                       [FromBody] ExecuteDeposityBody body,
@@ -78,6 +66,19 @@ public static class AccountsEndpoints
             _ => TypedResults.NotFound()
         );
     }
+
+    private static async Task<IResult> SearchAccountTransactions([AsParameters] SearchAccountTransactionsQuery query,
+                                                                 IMediator mediator,
+                                                                 HttpContext context,
+                                                                 CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(query, cancellationToken);
+
+        return result.Match<IResult>(
+            success => TypedResults.Ok(SearchAccountTransactionsResponse.From(context.Request, success)),
+            _ => TypedResults.NotFound()
+        );
+    }
 }
 
 public readonly record struct ExecuteDeposityBody
@@ -105,3 +106,46 @@ public readonly record struct ExecuteWithdrawBody
         withdrawType = WithdrawType;
     }
 }
+
+public record SearchAccountTransactionsResponse : PagedResult<ReadModels.Transaction>
+{
+    public static SearchAccountTransactionsResponse From(HttpRequest request, PagedResult<ReadModels.Transaction> inner)
+    {
+        var (transactions, currentPage, pageSize, totalRecords) = inner;
+        return new SearchAccountTransactionsResponse(request, transactions, currentPage, pageSize, totalRecords);
+    }
+
+    private SearchAccountTransactionsResponse(HttpRequest request,
+                                              IEnumerable<ReadModels.Transaction> records,
+                                              int currentPage,
+                                              int pageSize,
+                                              int totalRecords)
+        : base(records, currentPage, pageSize, totalRecords)
+    {
+        ApiLink[] links =
+        [
+            CreatePageLink(request, "first-page", 0),
+            CreatePageLink(request, "last-page", TotalPages - 1),
+        ];
+
+        if (!FirstPage)
+            links = [..links, CreatePageLink(request, "previous-page", CurrentPage - 1)];
+
+        if (!LastPage)
+            links = [..links, CreatePageLink(request, "next-page", CurrentPage + 1)];
+
+        Links = links;
+    }
+
+    private static ApiLink CreatePageLink(HttpRequest request, string rel, int page)
+    {
+        var temp = request.Query.ToDictionary();
+        temp["currentPage"] = page.ToString();
+        var qs = QueryString.Create(temp);
+        return new ApiLink(rel, $"{request.Path}{qs}");
+    }
+
+    public ApiLink[] Links { get; private init; }
+}
+
+public readonly record struct ApiLink(string Rel, string Href);

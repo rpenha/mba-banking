@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Banking.Api.Endpoints;
 using Banking.Application.EntityFramework;
@@ -47,11 +48,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 
@@ -70,6 +73,6 @@ app.UseSwaggerUI(options =>
 #endregion
 
 app.MapGroup("/v1/customers").MapCustomersApi();
-app.MapGroup("/v1/accounts").MapAccountsApi();
+app.MapGroup("/v1/accounts").MapTransactionsApi();
 
 app.Run();

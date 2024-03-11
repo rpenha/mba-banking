@@ -37,17 +37,3 @@ public partial class GetCustomerResult : OneOfBase<CustomerFound, CustomerNotFou
 public readonly record struct CustomerFound(ReadModels.Customer Customer);
 
 public readonly record struct CustomerNotFound(GetCustomerQuery Request);
-
-public static class ReadModels
-{
-    public record Customer
-    {
-        public required Guid Id { get; init; }
-        public required string TaxId { get; init; }
-        public required string FirstName { get; init; }
-        public required string LastName { get; init; }
-        public required DateOnly DateOfBirth { get; init; }
-        public required DateTimeOffset CreatedAt { get; init; }
-        public required DateTimeOffset UpdatedAt { get; set; }
-    }
-}
