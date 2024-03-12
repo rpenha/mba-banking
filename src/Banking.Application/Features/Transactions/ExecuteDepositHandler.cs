@@ -1,4 +1,3 @@
-using Banking.Application.Features.CheckingAccounts;
 using Banking.Core.Accounts;
 using Banking.Core.Transactions;
 using MediatR;
@@ -12,21 +11,26 @@ public sealed class ExecuteDepositHandler : IRequestHandler<ExecuteDepositComman
 {
     private readonly IAccountRepository _accountRepository;
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IUnitOfWorkFactory _uowFactory;
     private readonly ILogger<ExecuteDepositHandler> _logger;
 
     public ExecuteDepositHandler(IAccountRepository accountRepository,
                                  ITransactionRepository transactionRepository,
+                                 IUnitOfWorkFactory uowFactory,
                                  ILogger<ExecuteDepositHandler> logger)
     {
         _accountRepository = accountRepository;
         _transactionRepository = transactionRepository;
+        _uowFactory = uowFactory;
         _logger = logger;
     }
 
     public async Task<ExecuteDepositResult> Handle(ExecuteDepositCommand request, CancellationToken cancellationToken)
     {
         var (accountId, amount, depositType) = request;
-        await using var uow = _accountRepository.GetUnitOfWork();
+        
+        await using var uow = _uowFactory.Create();
+        
         var accountLoad = await _accountRepository.LoadAsync(accountId, cancellationToken);
 
         ExecuteDepositResult result = null!;
@@ -41,8 +45,8 @@ public sealed class ExecuteDepositHandler : IRequestHandler<ExecuteDepositComman
                 await _accountRepository.SaveAsync(account, cancellationToken);
                 result = new ExecuteDepositSuccess(deposit.Id);
             },
-            () => Task.FromResult(new AccountNotFound(accountId)));
-
+            () => Task.FromResult(new RecordFound<Guid>(accountId)));
+        
         await uow.CommitAsync(cancellationToken);
 
         return result;
@@ -60,7 +64,7 @@ public record ExecuteDepositCommand(Guid AccountId, decimal Amount, DepositType 
 }
 
 [GenerateOneOf]
-public partial class ExecuteDepositResult : OneOfBase<ExecuteDepositSuccess, AccountNotFound>
+public partial class ExecuteDepositResult : OneOfBase<ExecuteDepositSuccess, RecordFound<Guid>>
 {
 }
 

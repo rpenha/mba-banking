@@ -6,20 +6,18 @@ using Microsoft.EntityFrameworkCore;
 namespace Banking.Application.EntityFramework;
 
 public abstract class EntityFrameworkRespository<TId, TAggregateRoot, TDbContext>
-    : IRepository<TId, TAggregateRoot>, IAsyncDisposable
+    : IRepository<TId, TAggregateRoot>
     where TId : IEquatable<TId>
     where TAggregateRoot : class, IAggregateRoot<TId>
     where TDbContext : DbContext
 {
     private readonly TDbContext _dbContext;
     private readonly ActivitySource _activitySource;
-    private readonly EntityFrameworkUnitOfWork _uow;
 
     protected EntityFrameworkRespository(TDbContext dbContext)
     {
         _dbContext = dbContext;
-        _activitySource = Activity.Current?.Source ?? new ActivitySource(nameof(EntityFrameworkRespository<TId, TAggregateRoot, TDbContext>));;
-        _uow = new EntityFrameworkUnitOfWork(dbContext);
+        _activitySource = Activity.Current?.Source ?? new ActivitySource(nameof(EntityFrameworkRespository<TId, TAggregateRoot, TDbContext>));
     }
 
     private DbSet<TAggregateRoot> Collection => _dbContext.Set<TAggregateRoot>();
@@ -44,8 +42,4 @@ public abstract class EntityFrameworkRespository<TId, TAggregateRoot, TDbContext
         using var _ = _activitySource.StartActivity();
         return await Collection.FindAsync([id], cancellationToken: cancellationToken);
     }
-
-    public IUnitOfWork GetUnitOfWork() => _uow;
-
-    public async ValueTask DisposeAsync() => await _uow.DisposeAsync();
 }

@@ -13,14 +13,11 @@ public class CheckingAccount : Account
                             CustomerId customerId,
                             BankBranch bankBranch,
                             AccountNumber accountNumber,
-                            Money totalLimit) : base(id, bankBranch, accountNumber, totalLimit.Currency)
+                            Money totalLimit) : base(id, customerId, bankBranch, accountNumber, totalLimit.Currency)
     {
-        CustomerId = customerId;
         TotalLimit = totalLimit;
         CurrentLimit = TotalLimit;
     }
-
-    public CustomerId CustomerId { get; private init; }
 
     public Money TotalLimit { get; private set; }
 
@@ -32,7 +29,7 @@ public class CheckingAccount : Account
         
         // Write-only property
         // ReSharper disable once ValueParameterNotUsed
-        init { }
+        private init { }
     }
 
     public Money UsedLimit
@@ -41,7 +38,7 @@ public class CheckingAccount : Account
         
         // Write-only property
         // ReSharper disable once ValueParameterNotUsed
-        init { }
+        private init { }
     }
 
     public static CheckingAccount NewCheckingAccount(CustomerId customerId, BankBranch bankBranch, Money totalLimit)

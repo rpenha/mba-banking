@@ -9,6 +9,4 @@ public interface IRepository<in TId, TAggregateRoot>
     Task SaveAsync(TAggregateRoot aggregate, CancellationToken cancellationToken = default);
 
     Task<Option<TAggregateRoot>> LoadAsync(TId id, CancellationToken cancellationToken = default);
-
-    IUnitOfWork GetUnitOfWork();
 }

@@ -1,8 +1,6 @@
-using System.Web;
 using Banking.Application.Features;
-using Banking.Application.Features.CheckingAccounts;
+using Banking.Application.Features.Accounts;
 using Banking.Application.Features.Transactions;
-using Banking.Core.Accounts;
 using Banking.Core.Transactions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -17,23 +15,41 @@ public static class AccountsEndpoints
              .Produces(StatusCodes.Status204NoContent)
              .Produces(StatusCodes.Status400BadRequest)
              .Produces(StatusCodes.Status422UnprocessableEntity)
-             .Produces(StatusCodes.Status500InternalServerError);
+             .Produces(StatusCodes.Status500InternalServerError)
+             .WithTags("Transactions");;
 
         group.MapPost("/{accountId:guid}/withdrawals", ExecuteWithdraw)
              .Produces(StatusCodes.Status204NoContent)
              .Produces(StatusCodes.Status400BadRequest)
              .Produces(StatusCodes.Status422UnprocessableEntity)
-             .Produces(StatusCodes.Status500InternalServerError);
+             .Produces(StatusCodes.Status500InternalServerError)
+             .WithTags("Transactions");;
 
         group.MapGet("/{accountId:guid}/transactions", SearchAccountTransactions)
              .Produces<SearchAccountTransactionsResponse>()
              .Produces(StatusCodes.Status400BadRequest)
              .Produces(StatusCodes.Status404NotFound)
-             .Produces(StatusCodes.Status500InternalServerError);
-
-        group.WithTags("Transactions");
+             .Produces(StatusCodes.Status500InternalServerError)
+             .WithTags("Transactions");
+        
+        group.MapGet("/{accountId:guid}", GetAccount)
+             .Produces<RecordFound<ReadModels.CheckingAccount>>()
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces(StatusCodes.Status500InternalServerError)
+             .WithTags("Accounts");
 
         return group;
+    }
+
+    private static async Task<IResult> GetAccount([FromRoute] Guid accountId,
+                                                  IMediator mediator,
+                                                  CancellationToken cancellationToken = default)
+    {
+        var query = new GetAccountQuery(accountId);
+        var result = await mediator.Send(query, cancellationToken);
+        return result.Match<IResult>(
+            TypedResults.Ok,
+            _ => TypedResults.NotFound());
     }
 
     private static async Task<IResult> ExecuteDeposit([FromRoute] Guid accountId,

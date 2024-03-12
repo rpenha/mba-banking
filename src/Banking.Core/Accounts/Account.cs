@@ -1,3 +1,4 @@
+using Banking.Core.Customers;
 using NodaMoney;
 
 namespace Banking.Core.Accounts;
@@ -8,23 +9,26 @@ public abstract class Account : AggregateRoot<AccountId>
     {
     }
 
-    protected Account(AccountId id, BankBranch bankBranch, AccountNumber accountNumber, Currency currency)
+    protected Account(AccountId id, CustomerId customerId, BankBranch bankBranch, AccountNumber accountNumber, Currency currency)
         : base(id)
     {
+        CustomerId = customerId;
         Currency = currency;
         BankBranch = bankBranch;
         AccountNumber = accountNumber;
         Balance = new Money(0m, Currency);
     }
 
+    public CustomerId CustomerId { get; private init; }
+
     public Currency Currency { get; private set; } = Currency.FromCode("BRL");
-    
+
     public BankBranch BankBranch { get; private init; }
 
     public AccountNumber AccountNumber { get; private init; }
 
     public Money Balance { get; private set; }
-    
+
     public virtual void Deposit(Money value)
     {
         CheckValidTransactionValue(value);

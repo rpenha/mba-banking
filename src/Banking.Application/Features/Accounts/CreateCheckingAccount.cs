@@ -1,19 +1,22 @@
+using Banking.Core;
 using Banking.Core.Accounts;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using NodaMoney;
 using OneOf;
 
-namespace Banking.Application.Features.CheckingAccounts;
+namespace Banking.Application.Features.Accounts;
 
 public sealed class CreateCheckingAccountHandler : IRequestHandler<CreateCheckingAccountCommand, CreateCheckingAccountResult>
 {
     private readonly IAccountRepository _repository;
+    private readonly IUnitOfWorkFactory _uowFactory;
     private readonly ILogger<CreateCheckingAccountHandler> _logger;
 
-    public CreateCheckingAccountHandler(IAccountRepository repository, ILogger<CreateCheckingAccountHandler> logger)
+    public CreateCheckingAccountHandler(IAccountRepository repository, IUnitOfWorkFactory uowFactory, ILogger<CreateCheckingAccountHandler> logger)
     {
         _repository = repository;
+        _uowFactory = uowFactory;
         _logger = logger;
     }
 
@@ -22,8 +25,8 @@ public sealed class CreateCheckingAccountHandler : IRequestHandler<CreateCheckin
         try
         {
             var (customerId, bankBranch, totalLimit) = request;
-            await using var uow = _repository.GetUnitOfWork();
             var limit = new Money(totalLimit, Currency.FromCode("BRL"));
+            await using var uow = _uowFactory.Create();
             var account = CheckingAccount.NewCheckingAccount(customerId, bankBranch, limit);
             await _repository.SaveAsync(account, cancellationToken);
             await uow.CommitAsync(cancellationToken);

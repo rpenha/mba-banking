@@ -1,4 +1,4 @@
-using Banking.Application.Features.CheckingAccounts;
+using Banking.Core;
 using Banking.Core.Accounts;
 using Banking.Core.Transactions;
 using MediatR;
@@ -12,21 +12,24 @@ public sealed class ExecuteWithdrawHandler : IRequestHandler<ExecuteWithdrawComm
 {
     private readonly IAccountRepository _accountRepository;
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IUnitOfWorkFactory _uowFactory;
     private readonly ILogger<ExecuteWithdrawHandler> _logger;
 
     public ExecuteWithdrawHandler(IAccountRepository accountRepository,
-                                 ITransactionRepository transactionRepository,
-                                 ILogger<ExecuteWithdrawHandler> logger)
+                                  ITransactionRepository transactionRepository,
+                                  IUnitOfWorkFactory uowFactory,
+                                  ILogger<ExecuteWithdrawHandler> logger)
     {
         _accountRepository = accountRepository;
         _transactionRepository = transactionRepository;
+        _uowFactory = uowFactory;
         _logger = logger;
     }
 
     public async Task<ExecuteWithdrawResult> Handle(ExecuteWithdrawCommand request, CancellationToken cancellationToken)
     {
         var (accountId, amount, depositType) = request;
-        await using var uow = _accountRepository.GetUnitOfWork();
+        await using var uow = _uowFactory.Create();
         var accountLoad = await _accountRepository.LoadAsync(accountId, cancellationToken);
 
         ExecuteWithdrawResult result = null!;
@@ -42,11 +45,12 @@ public sealed class ExecuteWithdrawHandler : IRequestHandler<ExecuteWithdrawComm
                     result = new InsufficientLimit(accountId);
                     return;
                 }
+
                 await _transactionRepository.SaveAsync(withdraw, cancellationToken);
                 await _accountRepository.SaveAsync(account, cancellationToken);
                 result = new ExecuteWithdrawSuccess(withdraw.Id);
             },
-            () => Task.FromResult(new AccountNotFound(accountId)));
+            () => Task.FromResult(new RecordNotFound<Guid>(accountId)));
 
         await uow.CommitAsync(cancellationToken);
 
@@ -65,7 +69,7 @@ public record ExecuteWithdrawCommand(Guid AccountId, decimal Amount, WithdrawTyp
 }
 
 [GenerateOneOf]
-public partial class ExecuteWithdrawResult : OneOfBase<ExecuteWithdrawSuccess, InsufficientLimit, AccountNotFound>
+public partial class ExecuteWithdrawResult : OneOfBase<ExecuteWithdrawSuccess, InsufficientLimit, RecordNotFound<Guid>>
 {
 }
 

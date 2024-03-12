@@ -18,12 +18,12 @@ public class GetCustomerHandler : IRequestHandler<GetCustomerQuery, GetCustomerR
     {
         var result = await _dbContext.Customers
                                      .Where(x => (Guid)x.Id == request.CustomerId)
-                                     .Select(x => x.ToReadModel())
+                                     .Select(x => x.ToCustomerModel())
                                      .FirstOrDefaultAsync(cancellationToken);
 
         return result switch
                {
-                   not null => new CustomerFound(result),
+                   not null => new RecordFound<ReadModels.Customer>(result),
                    _ => new CustomerNotFound(request)
                };
     }
@@ -32,8 +32,6 @@ public class GetCustomerHandler : IRequestHandler<GetCustomerQuery, GetCustomerR
 public readonly record struct GetCustomerQuery(Guid CustomerId) : IRequest<GetCustomerResult>;
 
 [GenerateOneOf]
-public partial class GetCustomerResult : OneOfBase<CustomerFound, CustomerNotFound>;
-
-public readonly record struct CustomerFound(ReadModels.Customer Customer);
+public partial class GetCustomerResult : OneOfBase<RecordFound<ReadModels.Customer>, CustomerNotFound>;
 
 public readonly record struct CustomerNotFound(GetCustomerQuery Request);

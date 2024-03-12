@@ -1,9 +1,10 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Banking.Api.Endpoints;
+using Banking.Application;
 using Banking.Application.EntityFramework;
 using Banking.Application.EntityFramework.Repositories;
 using Banking.Application.Features.Customers;
+using Banking.Core;
 using Banking.Core.Accounts;
 using Banking.Core.Customers;
 using Banking.Core.Transactions;
@@ -25,6 +26,8 @@ builder.Services.AddDbContext<BankingDbContext>(options =>
     options.UseNpgsql(connectionString)
            .UseSnakeCaseNamingConvention();
 });
+
+builder.Services.AddScoped<IUnitOfWorkFactory, EntityFrameworkUnitOfWorkFactory<BankingDbContext>>();
 
 #region Repositories
 
@@ -48,13 +51,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 

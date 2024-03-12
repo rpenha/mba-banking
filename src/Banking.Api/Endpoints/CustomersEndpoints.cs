@@ -1,5 +1,5 @@
 using Banking.Application.Features;
-using Banking.Application.Features.CheckingAccounts;
+using Banking.Application.Features.Accounts;
 using Banking.Application.Features.Customers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -16,19 +16,36 @@ public static class CustomersEndpoints
              .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapGet("/{customerId:guid}", GetCustomer)
-             .Produces<ReadModels.Customer>()
+             .Produces<RecordFound<ReadModels.Customer>>()
              .Produces(StatusCodes.Status404NotFound)
              .Produces(StatusCodes.Status500InternalServerError);
-        
-        group.MapPost("/{customerId:guid}/checking-accounts", CreateCheckingAccount)
+
+        group.MapPost("/{customerId:guid}/accounts", CreateCheckingAccount)
              .Produces(StatusCodes.Status201Created)
              .Produces(StatusCodes.Status400BadRequest)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Accounts");
         
+        group.MapGet("/{customerId:guid}/accounts", GetCustomerAccounts)
+             .Produces<GetCustomerAccountsSuccess>()
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces(StatusCodes.Status500InternalServerError)
+             .WithTags("Accounts");
+
         group.WithTags("Customers");
-        
+
         return group;
+    }
+    
+    private static async Task<IResult> GetCustomerAccounts([FromRoute] Guid customerId,
+                                                           IMediator mediator,
+                                                           CancellationToken cancellationToken = default)
+    {
+        var query = new GetCustomerAccountsQuery(customerId);
+        var result = await mediator.Send(query, cancellationToken);
+        return result.Match<IResult>(
+            TypedResults.Ok,
+            _ => TypedResults.NotFound());
     }
 
     private static async Task<IResult> CreateCustomer(CreateCustomerCommand command,
@@ -37,7 +54,6 @@ public static class CustomersEndpoints
                                                       CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
-        
         var requestPath = context.Request.Path;
 
         return result.Match<IResult>(
@@ -52,9 +68,11 @@ public static class CustomersEndpoints
     {
         var query = new GetCustomerQuery(customerId);
         var result = await mediator.Send(query, cancellationToken);
-        return result.Match<IResult>(TypedResults.Ok, _ => TypedResults.NotFound());
+        return result.Match<IResult>(
+            TypedResults.Ok,
+            _ => TypedResults.NotFound());
     }
-    
+
     private static async Task<IResult> CreateCheckingAccount([FromRoute] Guid customerId,
                                                              [FromBody] CreateCheckingAccountBody body,
                                                              IMediator mediator,
@@ -67,7 +85,7 @@ public static class CustomersEndpoints
         var requestPath = context.Request.Path;
 
         return result.Match<IResult>(
-            success => TypedResults.Created($"{requestPath}/{success.AccountId}"),
+            success => TypedResults.Created($"/v1/accounts/{success.AccountId}"),
             failure => TypedResults.Problem(title: failure.Description)
         );
     }

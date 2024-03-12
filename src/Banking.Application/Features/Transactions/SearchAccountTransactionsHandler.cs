@@ -22,7 +22,7 @@ public class SearchAccountTransactionsHandler : IRequestHandler<SearchAccountTra
         var accountExists = await _dbContext.Accounts
                                             .AnyAsync(x => (Guid)x.Id == accountId, cancellationToken);
 
-        if (!accountExists) return new AccountNotFound(accountId);
+        if (!accountExists) return new RecordNotFound<Guid>(accountId);
 
         var totalRecords = await _dbContext.Transactions
                                            .CountAsync(x => (Guid)x.AccountId == accountId
@@ -35,7 +35,7 @@ public class SearchAccountTransactionsHandler : IRequestHandler<SearchAccountTra
                                                   && endDate >= x.Timestamp)
                                       .Skip(skip)
                                       .Take(pageSize)
-                                      .Select(x => x.ToReadModel())
+                                      .Select(x => x.ToTransactionModel())
                                       .ToArrayAsync(cancellationToken);
 
         return new SearchAccountTransactionsSuccess(records, currentPage, pageSize, totalRecords);
@@ -43,7 +43,7 @@ public class SearchAccountTransactionsHandler : IRequestHandler<SearchAccountTra
 }
 
 [GenerateOneOf]
-public partial class SearchAccountTransactionsResult : OneOfBase<SearchAccountTransactionsSuccess, AccountNotFound>;
+public partial class SearchAccountTransactionsResult : OneOfBase<SearchAccountTransactionsSuccess, RecordNotFound<Guid>>;
 
 public sealed record SearchAccountTransactionsSuccess(IEnumerable<ReadModels.Transaction> Records, int CurrentPage, int PageSize, int TotalRecords)
     : PagedResult<ReadModels.Transaction>(Records, CurrentPage, PageSize, TotalRecords);
@@ -68,7 +68,7 @@ public sealed record SearchAccountTransactionsQuery : IRequest<SearchAccountTran
         page = Page;
         size = Size;
         skip = Skip;
-        start = Start!.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-        end = End!.Value.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
+        start = Start!.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local).ToUniversalTime();
+        end = End!.Value.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Local).ToUniversalTime();
     }
 }

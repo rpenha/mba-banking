@@ -1,3 +1,4 @@
+using Banking.Core;
 using Banking.Core.Customers;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -8,11 +9,13 @@ namespace Banking.Application.Features.Customers;
 public sealed class CreateCustomerHandler : IRequestHandler<CreateCustomerCommand, CreateCustomerResult>
 {
     private readonly ICustomerRepository _repository;
+    private readonly IUnitOfWorkFactory _uowFactory;
     private readonly ILogger<CreateCustomerHandler> _logger;
 
-    public CreateCustomerHandler(ICustomerRepository repository, ILogger<CreateCustomerHandler> logger)
+    public CreateCustomerHandler(ICustomerRepository repository, IUnitOfWorkFactory uowFactory, ILogger<CreateCustomerHandler> logger)
     {
         _repository = repository;
+        _uowFactory = uowFactory;
         _logger = logger;
     }
     
@@ -22,7 +25,7 @@ public sealed class CreateCustomerHandler : IRequestHandler<CreateCustomerComman
         {
             // TODO: Check if a customer with this taxId already exists
             var (taxId, firstName, lastName, dateOfBirth) = request;
-            await using var uow = _repository.GetUnitOfWork();
+            await using var uow = _uowFactory.Create();  
             var name = PersonName.From(firstName, lastName);
             var customerId = CustomerId.NewId();
             var customer = new Customer(customerId, taxId, name, dateOfBirth);
