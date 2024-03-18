@@ -1,5 +1,4 @@
 using Banking.Core.Transactions;
-using NodaMoney;
 
 namespace Banking.Application.Features;
 

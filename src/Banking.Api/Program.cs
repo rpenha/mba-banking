@@ -4,7 +4,6 @@ using Banking.Application;
 using Banking.Application.EntityFramework;
 using Banking.Application.EntityFramework.Repositories;
 using Banking.Application.Features.Customers;
-using Banking.Core;
 using Banking.Core.Accounts;
 using Banking.Core.Customers;
 using Banking.Core.Transactions;

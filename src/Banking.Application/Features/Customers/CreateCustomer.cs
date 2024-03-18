@@ -1,4 +1,3 @@
-using Banking.Core;
 using Banking.Core.Customers;
 using MediatR;
 using Microsoft.Extensions.Logging;
