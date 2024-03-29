@@ -72,7 +72,7 @@ app.UseSwaggerUI(options =>
 
 #endregion
 
-app.MapGroup("/v1/customers").MapCustomersApi();
-app.MapGroup("/v1/accounts").MapTransactionsApi();
+app.MapGroup("/api/customers").MapCustomersApi();
+app.MapGroup("/api/accounts").MapTransactionsApi();
 
 app.Run();

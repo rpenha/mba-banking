@@ -85,7 +85,7 @@ public static class CustomersEndpoints
         var requestPath = context.Request.Path;
 
         return result.Match<IResult>(
-            success => TypedResults.Created($"/v1/accounts/{success.AccountId}"),
+            success => TypedResults.Created($"/api/accounts/{success.AccountId}"),
             failure => TypedResults.Problem(title: failure.Description)
         );
     }
