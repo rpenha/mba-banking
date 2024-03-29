@@ -29,15 +29,17 @@ public class CheckingAccount : Account
         
         // Write-only property
         // ReSharper disable once ValueParameterNotUsed
+        // ReSharper disable once UnusedMember.Local
         private init { }
     }
 
     public Money UsedLimit
     {
-        get { return TotalLimit - CurrentLimit; }
-        
+        get => TotalLimit - CurrentLimit;
+
         // Write-only property
         // ReSharper disable once ValueParameterNotUsed
+        // ReSharper disable once UnusedMember.Local
         private init { }
     }
 
