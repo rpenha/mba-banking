@@ -25,15 +25,15 @@ public static class ReadModels
         public required TransactionDirection Direction { get; init; }
     }
 
-    public record CustomerAccount
-    {
-        public required Guid Id { get; init; }
-        public required string BankBranch { get; init; }
-        public required string AccountNumber { get; init; }
-        public required string Currency { get; init; }
-        public required DateTimeOffset CreatedAt { get; init; }
-        public required DateTimeOffset UpdatedAt { get; init; }
-    }
+    // public record CustomerAccount
+    // {
+    //     public required Guid Id { get; init; }
+    //     public required string BankBranch { get; init; }
+    //     public required string AccountNumber { get; init; }
+    //     public required string Currency { get; init; }
+    //     public required DateTimeOffset CreatedAt { get; init; }
+    //     public required DateTimeOffset UpdatedAt { get; init; }
+    // }
 
     public record CheckingAccount
     {
@@ -43,6 +43,7 @@ public static class ReadModels
         public required string AccountNumber { get; init; }
         public required string Currency { get; init; }
         public required decimal Balance { get; init; }
+        public decimal AvailableAmount => Balance + CurrentLimit;
         public required decimal TotalLimit { init; get; }
         public required decimal CurrentLimit { get; init; }
         public required decimal UsedLimit { init; get; }

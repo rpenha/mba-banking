@@ -33,9 +33,10 @@ public class SearchAccountTransactionsHandler : IRequestHandler<SearchAccountTra
                                       .Where(x => (Guid)x.AccountId == accountId
                                                   && startDate <= x.Timestamp
                                                   && endDate >= x.Timestamp)
+                                      .OrderByDescending(x => x.Timestamp)
                                       .Skip(skip)
                                       .Take(pageSize)
-                                      .Select(x => x.ToTransactionModel())
+                                      .Select(x => x.ToModel())
                                       .ToArrayAsync(cancellationToken);
 
         return new SearchAccountTransactionsSuccess(records, currentPage, pageSize, totalRecords);

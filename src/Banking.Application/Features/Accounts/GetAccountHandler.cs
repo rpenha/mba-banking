@@ -20,7 +20,7 @@ public sealed class GetAccountHandler : IRequestHandler<GetAccountQuery, GetAcco
         var result = await _dbContext.Accounts
                                      .OfType<CheckingAccount>()
                                      .Where(x => (Guid)x.Id == request.AccountId)
-                                     .Select(x => x.ToCheckingAccountModel())
+                                     .Select(x => x.ToModel())
                                      .FirstOrDefaultAsync(cancellationToken);
         
         return result switch

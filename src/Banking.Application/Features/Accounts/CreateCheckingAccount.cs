@@ -23,9 +23,9 @@ public sealed class CreateCheckingAccountHandler : IRequestHandler<CreateCheckin
     {
         try
         {
+            await using var uow = _uowFactory.Create();
             var (customerId, bankBranch, totalLimit) = request;
             var limit = new Money(totalLimit, Currency.FromCode("BRL"));
-            await using var uow = _uowFactory.Create();
             var account = CheckingAccount.NewCheckingAccount(customerId, bankBranch, limit);
             await _repository.SaveAsync(account, cancellationToken);
             await uow.CommitAsync(cancellationToken);

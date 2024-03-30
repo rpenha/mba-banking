@@ -13,26 +13,33 @@ public static class CustomersEndpoints
         group.MapPost("/", CreateCustomer)
              .Produces(StatusCodes.Status201Created)
              .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapGet("/{customerId:guid}", GetCustomer)
              .Produces<RecordFound<ReadModels.Customer>>()
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status404NotFound)
              .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapPost("/{customerId:guid}/accounts", CreateCheckingAccount)
              .Produces(StatusCodes.Status201Created)
              .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Accounts");
         
         group.MapGet("/{customerId:guid}/accounts", GetCustomerAccounts)
              .Produces<GetCustomerAccountsSuccess>()
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status404NotFound)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Accounts");
 
-        group.WithTags("Customers");
+        //group.WithTags("Customers");
+        
+        group.WithTags("Customers")
+             .RequireAuthorization();
 
         return group;
     }

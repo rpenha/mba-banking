@@ -13,7 +13,7 @@ public static partial class ReadModelsMapper
     
     [MapProperty($"{nameof(Transaction.Value)}.{nameof(Transaction.Value.Amount)}", nameof(ReadModels.Transaction.Amount))]
     [MapProperty($"{nameof(Transaction.Value)}.{nameof(Transaction.Value.Currency)}.{nameof(Transaction.Value.Currency.Code)}", nameof(ReadModels.Transaction.Currency))]
-    public static partial ReadModels.Transaction ToTransactionModel(this Transaction source);
+    public static partial ReadModels.Transaction ToModel(this Transaction source);
     
     
     [MapProperty($"{nameof(CheckingAccount.Currency)}.{nameof(CheckingAccount.Currency.Code)}", nameof(ReadModels.CheckingAccount.Currency))]
@@ -21,11 +21,11 @@ public static partial class ReadModelsMapper
     [MapProperty($"{nameof(CheckingAccount.TotalLimit)}.{nameof(CheckingAccount.TotalLimit.Amount)}", nameof(ReadModels.CheckingAccount.TotalLimit))]
     [MapProperty($"{nameof(CheckingAccount.CurrentLimit)}.{nameof(CheckingAccount.CurrentLimit.Amount)}", nameof(ReadModels.CheckingAccount.CurrentLimit))]
     [MapProperty($"{nameof(CheckingAccount.UsedLimit)}.{nameof(CheckingAccount.UsedLimit.Amount)}", nameof(ReadModels.CheckingAccount.UsedLimit))]
-    public static partial ReadModels.CheckingAccount ToCheckingAccountModel(this CheckingAccount source);
+    public static partial ReadModels.CheckingAccount ToModel(this CheckingAccount source);
 
-    [MapperIgnoreSource(nameof(Account.Balance))]
-    [MapperIgnoreSource(nameof(Account.CustomerId))]
-    [MapProperty($"{nameof(Account.Currency)}.{nameof(Account.Currency.Code)}", nameof(ReadModels.CustomerAccount.Currency))]
-    [MapProperty($"{nameof(Account.Currency)}.{nameof(Account.Currency.Code)}", nameof(ReadModels.CustomerAccount.Currency))]
-    public static partial ReadModels.CustomerAccount ToCustomerAccountModel(this Account source);
+    // [MapperIgnoreSource(nameof(Account.Balance))]
+    // [MapperIgnoreSource(nameof(Account.CustomerId))]
+    // [MapProperty($"{nameof(Account.Currency)}.{nameof(Account.Currency.Code)}", nameof(ReadModels.CustomerAccount.Currency))]
+    // [MapProperty($"{nameof(Account.Currency)}.{nameof(Account.Currency.Code)}", nameof(ReadModels.CustomerAccount.Currency))]
+    // public static partial ReadModels.CustomerAccount ToCustomerAccountModel(this Account source);
 }

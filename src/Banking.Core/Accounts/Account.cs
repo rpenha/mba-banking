@@ -27,7 +27,7 @@ public abstract class Account : AggregateRoot<AccountId>
 
     public AccountNumber AccountNumber { get; private init; }
 
-    public Money Balance { get; private set; }
+    public virtual Money Balance { get; private set; }
 
     public virtual void Deposit(Money value)
     {

@@ -18,7 +18,7 @@ public class CheckingAccount : Account
         TotalLimit = totalLimit;
         CurrentLimit = TotalLimit;
     }
-
+    
     public Money TotalLimit { get; private set; }
 
     public Money CurrentLimit { get; private set; }

@@ -21,3 +21,14 @@ services:
       - "5432"
     ports:
       - "5432:5432"
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    hostname: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+    ports:
+      - 8080:8080

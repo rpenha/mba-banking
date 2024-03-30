@@ -14,6 +14,7 @@ public static class AccountsEndpoints
         group.MapPost("/{accountId:guid}/deposits", ExecuteDeposit)
              .Produces(StatusCodes.Status204NoContent)
              .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status422UnprocessableEntity)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Transactions");;
@@ -21,6 +22,7 @@ public static class AccountsEndpoints
         group.MapPost("/{accountId:guid}/withdrawals", ExecuteWithdraw)
              .Produces(StatusCodes.Status204NoContent)
              .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status422UnprocessableEntity)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Transactions");;
@@ -28,15 +30,19 @@ public static class AccountsEndpoints
         group.MapGet("/{accountId:guid}/transactions", SearchAccountTransactions)
              .Produces<SearchAccountTransactionsResponse>()
              .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status404NotFound)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Transactions");
         
         group.MapGet("/{accountId:guid}", GetAccount)
              .Produces<RecordFound<ReadModels.CheckingAccount>>()
+             .Produces(StatusCodes.Status401Unauthorized)
              .Produces(StatusCodes.Status404NotFound)
              .Produces(StatusCodes.Status500InternalServerError)
              .WithTags("Accounts");
+
+        group.RequireAuthorization();
 
         return group;
     }
