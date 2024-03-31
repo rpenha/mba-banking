@@ -13,5 +13,5 @@ public enum WithdrawType
     // Check withdrawal - This indicates that a check was cashed and the funds were withdrawn from your account.
     CheckWithdrawal,
     // Cash withdrawal - Bank branch - This specifies that you withdrew cash from a teller at a bank branch.
-    CashWithdrawl
+    CashWithdrawal
 }
