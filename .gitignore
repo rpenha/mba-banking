@@ -484,3 +484,5 @@ $RECYCLE.BIN/
 *.swp
 
 .idea/
+build/
+README.local.md
