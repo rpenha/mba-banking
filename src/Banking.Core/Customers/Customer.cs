@@ -14,7 +14,7 @@ public class Customer : AggregateRoot<CustomerId>
         DateOfBirth = dateOfBirth;
     }
 
-    public TaxId TaxId { get; private init; }
+    public TaxId TaxId { get; private init; } = null!;
     public PersonName Name { get; private init; }
     public string FirstName => Name.FirstName;
     public string LastName => Name.LastName;
