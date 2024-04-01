@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Text.Json.Serialization;
 using Banking.Api.Endpoints;
 using Banking.Application;
@@ -9,12 +8,9 @@ using Banking.Application.Features.Customers;
 using Banking.Core.Accounts;
 using Banking.Core.Customers;
 using Banking.Core.Transactions;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +31,8 @@ builder.Services.AddDbContext<BankingDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWorkFactory, EntityFrameworkUnitOfWorkFactory<BankingDbContext>>();
 
+#endregion
+
 #region Repositories
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -45,11 +43,6 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 
 #region Authentication/Authorization
-
-// const string realm = "banking";
-// const string authority = $"http://localhost:8080/realms/{realm}";
-// const bool requireHttpMetadata = false;
-//const string clientId = "banking-webapp";
 
 var keycloakSettings = new KeycloakSettings();
 builder.Configuration.GetSection(KeycloakSettings.ConfigSectionName).Bind(keycloakSettings);
@@ -76,43 +69,11 @@ JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 #endregion
 
 builder.Services.AddHealthChecks();
-
-#region Swagger
-
-
 builder.Services.AddControllers();
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen(c =>
-// {
-//     // c.AddSecurityDefinition("oauth2",
-//     //                         new OpenApiSecurityScheme
-//     //                         {
-//     //                             Type = SecuritySchemeType.OAuth2,
-//     //                             Name = "Bearer",
-//     //                             In = ParameterLocation.Header,
-//     //                             Flows = new OpenApiOAuthFlows
-//     //                                     {
-//     //                                         Password = new OpenApiOAuthFlow
-//     //                                                    {
-//     //                                                        TokenUrl = new Uri("http://localhost:8080/realms/banking/protocol/openid-connect/token", UriKind.Absolute),
-//     //                                                        Scopes = new Dictionary<string, string>
-//     //                                                                 {
-//     //                                                                     // { "readAccess", "Access read operations" },
-//     //                                                                     // { "writeAccess", "Access write operations" }
-//     //                                                                 }
-//     //                                                    }
-//     //                                     }
-//     //                         });
-// });
-
-#endregion
-
-#endregion
 
 builder.Services.ConfigureHttpJsonOptions(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
-
 
 var app = builder.Build();
 
@@ -120,25 +81,6 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
-
-#region Swagger
-
-// app.UseSwagger();
-// app.UseSwaggerUI(options =>
-// {
-//     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-//     options.RoutePrefix = string.Empty;
-//
-//     options.OAuthClientId(clientId);
-//     //options.OAuthClientSecret(clientSecret);
-//     options.OAuthRealm(realm);
-//     //options.OAuthAppName("test-app");
-//     //options.OAuthScopeSeparator(" ");
-//     //options.OAuthAdditionalQueryStringParams(new Dictionary<string, string> { { "foo", "bar" }});
-//     //options.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-// });
-
-#endregion
 
 app.MapHealthChecks("/healthz");
 app.MapFallbackToFile("index.html");
