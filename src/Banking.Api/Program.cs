@@ -141,6 +141,7 @@ app.UseAuthorization();
 #endregion
 
 app.MapHealthChecks("/healthz");
+app.MapFallbackToFile("index.html");
 app.MapGroup("/api/customers").MapCustomersApi();
 app.MapGroup("/api/accounts").MapTransactionsApi();
 
