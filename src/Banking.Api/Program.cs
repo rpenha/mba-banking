@@ -116,6 +116,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options => { op
 
 var app = builder.Build();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
