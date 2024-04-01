@@ -46,10 +46,14 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 #region Authentication/Authorization
 
-const string realm = "banking";
-const string authority = $"http://localhost:8080/realms/{realm}";
-const string clientId = "banking-webapp";
-//const string? clientSecret = "LuRm0isa4uHEmsjP7LQImBPjD9mN64A6";
+// const string realm = "banking";
+// const string authority = $"http://localhost:8080/realms/{realm}";
+// const bool requireHttpMetadata = false;
+//const string clientId = "banking-webapp";
+
+var keycloakSettings = new KeycloakSettings();
+builder.Configuration.GetSection(KeycloakSettings.ConfigSectionName).Bind(keycloakSettings);
+var (authority, requireHttpsMetadata) = keycloakSettings;
 
 builder.Services
        .AddAuthentication(options =>
@@ -60,46 +64,46 @@ builder.Services
        .AddJwtBearer(options =>
        {
            options.Authority = authority;
+           options.RequireHttpsMetadata = requireHttpsMetadata;
            options.TokenValidationParameters = new TokenValidationParameters
                                                {
                                                    ValidateAudience = false
                                                };
-           options.RequireHttpsMetadata = false;
        });
-
-//builder.Services.AddAuthorization(options => { options.AddPolicy("UserRole", policy => { policy.RequireClaim("role", "user"); }); });
 
 JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
 #endregion
 
+builder.Services.AddHealthChecks();
 
 #region Swagger
 
+
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("oauth2",
-                            new OpenApiSecurityScheme
-                            {
-                                Type = SecuritySchemeType.OAuth2,
-                                Name = "Bearer",
-                                In = ParameterLocation.Header,
-                                Flows = new OpenApiOAuthFlows
-                                        {
-                                            Password = new OpenApiOAuthFlow
-                                                       {
-                                                           TokenUrl = new Uri("http://localhost:8080/realms/banking/protocol/openid-connect/token", UriKind.Absolute),
-                                                           Scopes = new Dictionary<string, string>
-                                                                    {
-                                                                        // { "readAccess", "Access read operations" },
-                                                                        // { "writeAccess", "Access write operations" }
-                                                                    }
-                                                       }
-                                        }
-                            });
-});
+// builder.Services.AddEndpointsApiExplorer();
+// builder.Services.AddSwaggerGen(c =>
+// {
+//     // c.AddSecurityDefinition("oauth2",
+//     //                         new OpenApiSecurityScheme
+//     //                         {
+//     //                             Type = SecuritySchemeType.OAuth2,
+//     //                             Name = "Bearer",
+//     //                             In = ParameterLocation.Header,
+//     //                             Flows = new OpenApiOAuthFlows
+//     //                                     {
+//     //                                         Password = new OpenApiOAuthFlow
+//     //                                                    {
+//     //                                                        TokenUrl = new Uri("http://localhost:8080/realms/banking/protocol/openid-connect/token", UriKind.Absolute),
+//     //                                                        Scopes = new Dictionary<string, string>
+//     //                                                                 {
+//     //                                                                     // { "readAccess", "Access read operations" },
+//     //                                                                     // { "writeAccess", "Access write operations" }
+//     //                                                                 }
+//     //                                                    }
+//     //                                     }
+//     //                         });
+// });
 
 #endregion
 
@@ -117,23 +121,24 @@ app.UseAuthorization();
 
 #region Swagger
 
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
-
-    options.OAuthClientId(clientId);
-    //options.OAuthClientSecret(clientSecret);
-    options.OAuthRealm(realm);
-    //options.OAuthAppName("test-app");
-    //options.OAuthScopeSeparator(" ");
-    //options.OAuthAdditionalQueryStringParams(new Dictionary<string, string> { { "foo", "bar" }});
-    //options.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-});
+// app.UseSwagger();
+// app.UseSwaggerUI(options =>
+// {
+//     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+//     options.RoutePrefix = string.Empty;
+//
+//     options.OAuthClientId(clientId);
+//     //options.OAuthClientSecret(clientSecret);
+//     options.OAuthRealm(realm);
+//     //options.OAuthAppName("test-app");
+//     //options.OAuthScopeSeparator(" ");
+//     //options.OAuthAdditionalQueryStringParams(new Dictionary<string, string> { { "foo", "bar" }});
+//     //options.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+// });
 
 #endregion
 
+app.MapHealthChecks("/healthz");
 app.MapGroup("/api/customers").MapCustomersApi();
 app.MapGroup("/api/accounts").MapTransactionsApi();
 
