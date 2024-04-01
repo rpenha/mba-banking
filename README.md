@@ -16,4 +16,4 @@
 
 ## Visão Simplificada da Solução
 
-![](/home/rodolfo/repos/Banking/BankingSolution.png)
+![Solution Overview](https://github.com/rpenha/mba-banking-api/blob/master/BankingSolution.png))
